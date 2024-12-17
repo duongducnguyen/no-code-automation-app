@@ -6,22 +6,23 @@
     "cra-template": "1.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.4.1",
+    "react-loading-skeleton": "^3.5.0",
+    "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^4.2.4"
   },
   "main": "electron/main.js",
-  "scripts": 
-  {
-    "start": "concurrently \"npm run react\" \"npm run electron\"",
-    "_start": "npm run react",
+  "scripts": {
+    "_start": "concurrently \"npm run react\" \"npm run electron\"",
+    "start": "npm run react",
     "react": "react-scripts start",
     "electron": "wait-on http://localhost:9999 && electron .",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": 
-  {
+  "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
@@ -40,8 +41,11 @@
     ]
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.0",
     "electron": "^33.2.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
     "wait-on": "^8.0.1"
   }
 }

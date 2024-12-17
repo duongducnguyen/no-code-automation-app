@@ -36,6 +36,26 @@ class AuthController extends Controller
         }
     }
 
+    // Lấy thông tin người dùng từ Token
+    public function getUserFromToken(Request $request)
+    {
+        try {
+            // Lấy thông tin người dùng đã được xác thực
+            $user = Auth::user();
+    
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+    
+            return response()->json(['user' => $user], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Failed to get user from token',
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
     // Đăng nhập
     public function login(Request $request)
     {
