@@ -42,6 +42,24 @@ export const register = async (name, email, password, password_confirmation) =>
   }
 };
 
+export const getUserInfo = async () => {
+
+  try 
+  {
+
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response.data;
+
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+
+};
+
 export const logout = async () => 
 {
   try 
