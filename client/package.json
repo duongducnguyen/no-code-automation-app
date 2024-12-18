@@ -18,8 +18,8 @@
   },
   "main": "electron/main.js",
   "scripts": {
-    "_start": "concurrently \"npm run react\" \"npm run electron\"",
-    "start": "npm run react",
+    "start": "concurrently \"npm run react\" \"npm run electron\"",
+    "_start": "npm run react",
     "react": "react-scripts start",
     "electron": "wait-on http://localhost:9999 && electron .",
     "build": "react-scripts build",

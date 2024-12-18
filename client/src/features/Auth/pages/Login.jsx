@@ -22,7 +22,9 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-const LoginPage = () => {
+const LoginPage = () => 
+{
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",

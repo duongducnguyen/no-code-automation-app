@@ -12,7 +12,8 @@ export const useAuth = () => {
   {
     setIsLoading(true);
 
-    try {
+    try 
+    {
       const response = await login(email, password);
 
       // Lưu token và thông tin user vào localStorage
@@ -23,7 +24,10 @@ export const useAuth = () => {
         duration: 5000, // Hiển thị trong 5 giây
       });
 
+      navigate("/dashboard");
+
       return response;
+
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Có lỗi xảy ra!";
       // Hiển thị toast thất bại
