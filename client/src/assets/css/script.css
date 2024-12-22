@@ -24,18 +24,6 @@
   transition: all 0.2s;
 }
 
-.node-button.start {
-  background-color: #4CAF50;
-}
-
-.node-button.openURL {
-  background-color: #2196F3;
-}
-
-.node-button.stop {
-  background-color: #F44336;
-}
-
 /* Nodes */
 .node {
   padding: 10px;
