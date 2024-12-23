@@ -1,8 +1,10 @@
 import StartNode from './other/StartNode';
 import OpenURLNode from './navigation/OpenURLNode';
-import RefreshPage from './navigation/RefreshPage';
+import RefreshPageNode from './navigation/RefreshPageNode';
 import StopNode from './other/StopNode';
-import { faPlay, faStop, faGlobe, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import VariablesNode from './other/VariablesNode';
+
+import { faPlay, faStop, faGlobe, faRefresh, faCog } from "@fortawesome/free-solid-svg-icons";
 
 // Node definitions with categories
 export const nodeCategories = {
@@ -49,7 +51,14 @@ export const nodeCategories = {
         label: "Stop", 
         color: "red",
         icon: faStop
+      },
+      { 
+        type: "variables", 
+        label: "Variables", 
+        color: "yellow",
+        icon: faCog
       }
+
     ]
   }
 };
@@ -58,8 +67,9 @@ export const nodeCategories = {
 export const nodeTypes = {
   start: StartNode,
   openURL: OpenURLNode,
-  refreshPage: RefreshPage,
-  stop: StopNode
+  refreshPage: RefreshPageNode,
+  stop: StopNode,
+  variables: VariablesNode,
 };
 
 // Flat node templates (if needed for compatibility)

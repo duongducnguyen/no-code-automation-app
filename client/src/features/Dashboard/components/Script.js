@@ -8,14 +8,13 @@ import ReactFlow, {
 } from "reactflow";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
-import Modal from 'react-modal';
+import Modal from "react-modal";
 import "reactflow/dist/style.css";
 import "../../../assets/css/script.css";
-import { nodeTypes, nodeCategories  } from "../../../components/nodes";
-
+import { nodeTypes, nodeCategories } from "../../../components/nodes";
+import { v4 as uuidv4 } from 'uuid';
 // Set app element for react-modal
-Modal.setAppElement('#root');
-
+Modal.setAppElement("#root");
 
 const Script = () => 
 {
@@ -23,22 +22,6 @@ const Script = () =>
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const reactFlowWrapper = useRef(null);
-
-  // Check if node type already exists
-  const hasNodeType = useCallback((type) => {
-    return nodes.some(node => node.type === type);
-  }, [nodes]);
-
-  // Update node data function
-  const updateNodeData = useCallback((nodeId, newData) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, ...newData } }
-          : node
-      )
-    );
-  }, []);
 
   // ResizeObserver error handler
   React.useEffect(() => {
@@ -63,6 +46,26 @@ const Script = () =>
     return () => window.removeEventListener("error", resizeObserverError);
   }, []);
 
+
+  // Check if node type already exists
+  const hasNodeType = useCallback(
+    (type) => {
+      return nodes.some((node) => node.type === type);
+    },
+    [nodes]
+  );
+
+  // Update node data function
+  const updateNodeData = useCallback((nodeId, newData) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...newData } }
+          : node
+      )
+    );
+  }, []);
+  
   // Handlers
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -76,76 +79,101 @@ const Script = () =>
 
   const onConnect = useCallback(
     (params) => {
-      console.log("New connection:", params);
+      console.log("connect");
+  
+      // Tạo một edge mới với thông tin chi tiết
+      const newEdge = {
+        id: params.id, // Tạo ID cho edge
+        source: params.source,
+        target: params.target,
+        sourceHandle: params.sourceHandle, // Thêm sourceHandle
+      };
+  
       setEdges((eds) => {
-        const newEdges = addEdge(params, eds);
-        console.log("Current flow:", {
-          nodes: nodes,
-          edges: newEdges,
-        });
+        // Thêm edge mới vào danh sách edges hiện tại
+        const newEdges = [...eds, newEdge];
         return newEdges;
       });
     },
-    [nodes]
+    [setEdges] // Chỉ cần setEdges trong dependency array
   );
 
   const addNewNode = useCallback(
-    (nodeType, nodeLabel) => {
-      if (
-        (nodeType === "start" && hasNodeType("start")) ||
-        (nodeType === "stop" && hasNodeType("stop"))
-      ) {
-        console.warn(`Cannot add more than one ${nodeType} node`);
-        return;
-      }
-
+    (nodeType, nodeLabel) => 
+      {
+      // if (hasNodeType(nodeType)) {
+        // console.warn(`Cannot add more than one ${nodeType} node`);
+        // return;
+      // }
+  
       if (!reactFlowWrapper.current) return;
-
+  
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const position = {
         x: nodes.length * 150 + 50,
         y: reactFlowBounds.height / 2 - 25,
       };
-
+  
+      let nodeData = {
+        label: nodeLabel,
+        updateNodeData
+      };
+  
+      if (nodeType === "openURL") {
+        nodeData.url = "";
+      } else if (nodeType === "variables") {
+        nodeData.variables = [];
+      }
+  
       const newNode = {
-        id: `${nodes.length + 1}`,
+        id: uuidv4(), // Sử dụng UUID để tạo ID duy nhất
         type: nodeType,
         position,
-        data: { 
-          label: nodeLabel,
-          updateNodeData,
-          url: ''
-        },
+        data: nodeData,
       };
-
+  
       setNodes((nds) => [...nds, newNode]);
     },
     [nodes, hasNodeType, updateNodeData]
   );
 
-  const handleStartSelenium = async () => {
-    try 
+  // Automatically add the intial node when the component mounts
+  React.useEffect(() => 
+  {
+  
+    if (!hasNodeType("start")) 
     {
+      addNewNode("start", "start");
+    }
+    if (!hasNodeType("variables")) 
+    {
+      addNewNode("variables", "variables");
+    }
+  }, [hasNodeType, addNewNode]);
+
+  const handleStartSelenium = async () => {
+    try {
       // Tạo flowData với dữ liệu đã được làm sạch
+
+      console.log("Current nodes before starting:", nodes); // Debugging line
+      
       const flowData = {
         nodes: nodes.map((node) => ({
           id: node.id,
           type: node.type,
-          data: {
-            label: node.data.label,
-            url: node.data.url || '',
-            // Loại bỏ hàm updateNodeData vì không thể serialize
-          }
+          data: node.data, // Sử dụng trực tiếp dữ liệu đã được cấu trúc trong addNewNode
         })),
         edges: edges.map((edge) => ({
           source: edge.source,
           target: edge.target,
           type: edge.type,
+          sourceHandle: edge.sourceHandle, // Thêm sourceHandle vào dữ liệu JSON
+          targetHandle: edge.targetHandle, // Thêm targetHandle vào dữ liệu JSON
         })),
       };
-  
+
       console.log("Flow Execution Data:", JSON.stringify(flowData, null, 2));
-  
+
       const result = await window.electronAPI.startSelenium(flowData);
       if (result.success) {
         setIsRunning(true);
@@ -207,23 +235,24 @@ const Script = () =>
         </button>
       </div>
 
- {/* Node Types Menu */}
- <div className="node-types-menu overflow-y-auto">
+      {/* Node Types Menu */}
+      <div className="node-types-menu overflow-y-auto">
         <h3 className="font-semibold mb-3">NODES MENU</h3>
-        
+
         {Object.entries(nodeCategories).map(([categoryKey, category]) => (
           <div key={categoryKey} className="mb-4">
             <h4 className="text-sm font-medium text-gray-600 mb-2 px-2">
               {category.label}
             </h4>
-            
+
             {category.nodes.map((node, index) => (
               <button
                 key={`${categoryKey}-${index}`}
                 onClick={() => addNewNode(node.type, node.label)}
                 disabled={
                   (node.type === "start" && hasNodeType("start")) ||
-                  (node.type === "stop" && hasNodeType("stop"))
+                  (node.type === "stop" && hasNodeType("stop")) ||
+                  (node.type === "variables" && hasNodeType("variables"))
                 }
                 className={`
                   node-button bg-${node.color}-500 w-full text-left
@@ -231,7 +260,8 @@ const Script = () =>
                   hover:bg-gray-100 flex items-center
                   ${
                     (node.type === "start" && hasNodeType("start")) ||
-                    (node.type === "stop" && hasNodeType("stop"))
+                    (node.type === "stop" && hasNodeType("stop")) ||
+                    (node.type === "variables" && hasNodeType("variables"))
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }
@@ -244,7 +274,7 @@ const Script = () =>
                 <span className="flex-1">{node.label}</span>
               </button>
             ))}
-            
+
             {category.nodes.length === 0 && (
               <p className="text-sm text-gray-400 italic px-2">
                 No nodes available

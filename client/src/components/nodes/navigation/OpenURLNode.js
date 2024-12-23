@@ -1,4 +1,3 @@
-// nodes/OpenURLNode.jsx
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -38,11 +37,15 @@ const OpenURLNode = ({ data, id }) => {
 
   return (
     <>
-      <div className="node process-node" onDoubleClick={handleDoubleClick}>
-        <Handle type="target" position={Position.Left} className="handle" />
+
+      <div className="node bg-blue-500 text-white border border-blue-800" onDoubleClick={handleDoubleClick}>
         <FontAwesomeIcon icon={faGlobe} className="mr-2" />
         {data.label} {data.url && `(${data.url})`}
-        <Handle type="source" position={Position.Right} className="handle" />
+
+        <Handle type="target" position={Position.Left} style={{ background: 'green' }} className="handle" />      
+        <Handle type="source" position={Position.Top} style={{ background: 'green' }} className="handle" id="success" />
+        <Handle type="source" position={Position.Bottom} style={{ background: 'red' }} className="handle" id="fail" />
+
       </div>
 
       <Modal
