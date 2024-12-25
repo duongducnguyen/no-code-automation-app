@@ -81,12 +81,19 @@ const Script = () =>
     (params) => {
       console.log("connect");
   
+      const edgeType = params.sourceHandle === "fail" ? "fail-edge" : "success-edge";
+
       // Tạo một edge mới với thông tin chi tiết
       const newEdge = {
-        id: params.id, // Tạo ID cho edge
+        id: uuidv4(), // Tạo ID cho edge
         source: params.source,
         target: params.target,
         sourceHandle: params.sourceHandle, // Thêm sourceHandle
+        className: `animated-edge ${edgeType}`, // Thêm các class
+        style: {
+          strokeWidth: 2,
+          // Có thể thêm các style inline khác ở đây
+        }
       };
   
       setEdges((eds) => {
@@ -152,11 +159,10 @@ const Script = () =>
   }, [hasNodeType, addNewNode]);
 
   const handleStartSelenium = async () => {
-    try {
-      // Tạo flowData với dữ liệu đã được làm sạch
-
-      console.log("Current nodes before starting:", nodes); // Debugging line
+    try 
+    {
       
+      // Tạo flowData với dữ liệu đã được làm sạch
       const flowData = {
         nodes: nodes.map((node) => ({
           id: node.id,
@@ -172,9 +178,13 @@ const Script = () =>
         })),
       };
 
-      console.log("Flow Execution Data:", JSON.stringify(flowData, null, 2));
 
-      const result = await window.electronAPI.startSelenium(flowData);
+      const flowDataString = JSON.stringify(flowData);
+
+      console.log("Flow Execution Data:", flowDataString);
+
+      const result = await window.electronAPI.startSelenium(flowDataString);
+
       if (result.success) {
         setIsRunning(true);
       } else {

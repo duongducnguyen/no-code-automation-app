@@ -41,3 +41,35 @@
   background: #555;
 }
 
+/* CSS nâng cao hơn với animation đồng bộ */
+.react-flow__edge-path {
+  stroke-width: 2;
+  stroke-dasharray: 10, 5;
+  animation: flowAndPulse 2s linear infinite; /* Cố định 2s cho mọi edge */
+}
+
+@keyframes flowAndPulse {
+  0% {
+    stroke-dashoffset: 15;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 1px currentColor);
+  }
+  50% {
+    stroke-dashoffset: 7.5;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 1px currentColor);
+  }
+}
+
+.success-edge .react-flow__edge-path {
+  stroke: #008000;
+}
+
+.fail-edge .react-flow__edge-path {
+  stroke: #FF0000;
+}

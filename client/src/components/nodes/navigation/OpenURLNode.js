@@ -42,7 +42,7 @@ const OpenURLNode = ({ data, id }) => {
         <FontAwesomeIcon icon={faGlobe} className="mr-2" />
         {data.label} {data.url && `(${data.url})`}
 
-        <Handle type="target" position={Position.Left} style={{ background: 'green' }} className="handle" />      
+        <Handle type="target" position={Position.Left} style={{ background: 'neutral' }} className="handle" />      
         <Handle type="source" position={Position.Top} style={{ background: 'green' }} className="handle" id="success" />
         <Handle type="source" position={Position.Bottom} style={{ background: 'red' }} className="handle" id="fail" />
 
