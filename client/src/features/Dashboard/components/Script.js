@@ -7,22 +7,34 @@ import ReactFlow, {
   addEdge,
 } from "reactflow";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faStop,
+  faUpload,
+  faDownload,
+} from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-modal";
 import "reactflow/dist/style.css";
 import "../../../assets/css/script.css";
 import { nodeTypes, nodeCategories } from "../../../components/nodes";
-import { v4 as uuidv4 } from 'uuid';
+import ContextMenu from "../../../components/ContextMenu";
+import { v4 as uuidv4 } from "uuid";
+
 // Set app element for react-modal
 Modal.setAppElement("#root");
 
-const Script = () => 
-{
+const Script = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const reactFlowWrapper = useRef(null);
-
+  const [contextMenu, setContextMenu] = useState({
+    show: false,
+    x: 0,
+    y: 0,
+    nodeId: null
+  });
+  
   // ResizeObserver error handler
   React.useEffect(() => {
     const resizeObserverError = (error) => {
@@ -46,7 +58,6 @@ const Script = () =>
     return () => window.removeEventListener("error", resizeObserverError);
   }, []);
 
-
   // Check if node type already exists
   const hasNodeType = useCallback(
     (type) => {
@@ -65,7 +76,7 @@ const Script = () =>
       )
     );
   }, []);
-  
+
   // Handlers
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -80,8 +91,9 @@ const Script = () =>
   const onConnect = useCallback(
     (params) => {
       console.log("connect");
-  
-      const edgeType = params.sourceHandle === "fail" ? "fail-edge" : "success-edge";
+
+      const edgeType =
+        params.sourceHandle === "fail" ? "fail-edge" : "success-edge";
 
       // Tạo một edge mới với thông tin chi tiết
       const newEdge = {
@@ -93,9 +105,9 @@ const Script = () =>
         style: {
           strokeWidth: 2,
           // Có thể thêm các style inline khác ở đây
-        }
+        },
       };
-  
+
       setEdges((eds) => {
         // Thêm edge mới vào danh sách edges hiện tại
         const newEdges = [...eds, newEdge];
@@ -106,62 +118,101 @@ const Script = () =>
   );
 
   const addNewNode = useCallback(
-    (nodeType, nodeLabel) => 
-      {
+    (nodeType, nodeLabel) => {
       // if (hasNodeType(nodeType)) {
-        // console.warn(`Cannot add more than one ${nodeType} node`);
-        // return;
+      // console.warn(`Cannot add more than one ${nodeType} node`);
+      // return;
       // }
-  
+
       if (!reactFlowWrapper.current) return;
-  
+
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const position = {
         x: nodes.length * 150 + 50,
         y: reactFlowBounds.height / 2 - 25,
       };
-  
+
       let nodeData = {
         label: nodeLabel,
-        updateNodeData
+        updateNodeData,
       };
-  
+
       if (nodeType === "openURL") {
         nodeData.url = "";
       } else if (nodeType === "variables") {
         nodeData.variables = [];
       }
-  
+
       const newNode = {
         id: uuidv4(), // Sử dụng UUID để tạo ID duy nhất
         type: nodeType,
         position,
         data: nodeData,
       };
-  
+
       setNodes((nds) => [...nds, newNode]);
     },
     [nodes, hasNodeType, updateNodeData]
   );
 
+  // Handler xóa node
+  const handleDeleteNode = useCallback((nodeId) => {
+    setNodes((nodes) => nodes.filter((node) => node.id !== nodeId));
+    setEdges((edges) => edges.filter((edge) => 
+      edge.source !== nodeId && edge.target !== nodeId
+    ));
+    setContextMenu({ show: false, x: 0, y: 0, nodeId: null });
+  }, []);
+
+  // Handler đóng context menu
+  const handleCloseContextMenu = useCallback(() => {
+    setContextMenu({ show: false, x: 0, y: 0, nodeId: null });
+  }, []);
+
+  // Handler cho node context menu
+  const onNodeContextMenu = useCallback((event, node) => {
+    // Prevent default context menu
+    event.preventDefault();
+    
+    // Kiểm tra nếu node là start hoặc variables thì không cho xóa
+    if (node.type === 'start' || node.type === 'variables') {
+      return;
+    }
+
+    setContextMenu({
+      show: true,
+      x: event.clientX,
+      y: event.clientY,
+      nodeId: node.id
+    });
+  }, []);
+
+  // Effect để handle click outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (contextMenu.show) {
+        handleCloseContextMenu();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contextMenu.show, handleCloseContextMenu]);
+
   // Automatically add the intial node when the component mounts
-  React.useEffect(() => 
-  {
-  
-    if (!hasNodeType("start")) 
-    {
+  React.useEffect(() => {
+    if (!hasNodeType("start")) {
       addNewNode("start", "start");
     }
-    if (!hasNodeType("variables")) 
-    {
+    if (!hasNodeType("variables")) {
       addNewNode("variables", "variables");
     }
   }, [hasNodeType, addNewNode]);
 
   const handleStartSelenium = async () => {
-    try 
-    {
-      
+    try {
       // Tạo flowData với dữ liệu đã được làm sạch
       const flowData = {
         nodes: nodes.map((node) => ({
@@ -177,7 +228,6 @@ const Script = () =>
           targetHandle: edge.targetHandle, // Thêm targetHandle vào dữ liệu JSON
         })),
       };
-
 
       const flowDataString = JSON.stringify(flowData);
 
@@ -207,6 +257,111 @@ const Script = () =>
       console.error("Error stopping Selenium:", error);
     }
   };
+
+  const handleRestoreFlow = useCallback(() => {
+    // Tạo input element ẩn để chọn file
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
+
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          try {
+            const flowData = JSON.parse(event.target.result);
+
+            // Kiểm tra và đặt lại nodes
+            if (flowData.nodes) {
+              const restoredNodes = flowData.nodes.map((node) => ({
+                ...node,
+                data: {
+                  ...node.data,
+                  updateNodeData, // Thêm lại function updateNodeData
+                },
+              }));
+              setNodes(restoredNodes);
+            }
+
+            // Kiểm tra và đặt lại edges
+            if (flowData.edges) {
+              const restoredEdges = flowData.edges.map((edge) => ({
+                ...edge,
+                id: edge.id || uuidv4(), // Đảm bảo edge có id
+                className:
+                  edge.sourceHandle === "fail"
+                    ? "animated-edge fail-edge"
+                    : "animated-edge success-edge",
+              }));
+              setEdges(restoredEdges);
+            }
+          } catch (error) {
+            console.error("Error parsing flow data:", error);
+            // Có thể thêm thông báo lỗi cho người dùng ở đây
+          }
+        };
+
+        reader.readAsText(file);
+      }
+    };
+
+    fileInput.click();
+  }, [setNodes, setEdges]);
+
+  const handleExportFlow = useCallback(() => {
+    try {
+      // Tạo flowData với cấu trúc tương tự như khi start selenium
+      const flowData = {
+        nodes: nodes.map((node) => ({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: {
+            ...node.data,
+            updateNodeData: undefined, // Loại bỏ function không cần thiết khi export
+          },
+        })),
+        edges: edges.map((edge) => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          sourceHandle: edge.sourceHandle,
+          targetHandle: edge.targetHandle,
+          className: edge.className,
+        })),
+      };
+
+      // Chuyển đổi thành chuỗi JSON
+      const flowDataString = JSON.stringify(flowData, null, 2);
+
+      // Tạo Blob từ chuỗi JSON
+      const blob = new Blob([flowDataString], { type: "application/json" });
+
+      // Tạo URL cho blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Tạo element a để download
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+
+      // Tạo tên file với timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      downloadLink.download = `flow-export-${timestamp}.json`;
+
+      // Thêm link vào document, click để download, và xóa link
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
+      // Giải phóng URL object
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting flow:", error);
+      // Có thể thêm thông báo lỗi cho người dùng ở đây
+    }
+  }, [nodes, edges]);
 
   return (
     <div className="w-full h-[calc(100vh-120px)] relative">
@@ -242,6 +397,38 @@ const Script = () =>
           `}
         >
           <FontAwesomeIcon icon={faStop} className="mr-2" /> Stop Script
+        </button>
+
+        <button
+          onClick={handleExportFlow}
+          disabled={isRunning || nodes.length === 0} // Disable nếu không có nodes hoặc đang chạy
+          className={`
+      px-4 py-2 rounded-md font-semibold text-white
+      transition-colors duration-300 flex items-center
+      ${
+        isRunning || nodes.length === 0
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-purple-500 hover:bg-purple-600 active:bg-purple-700"
+      }
+    `}
+        >
+          <FontAwesomeIcon icon={faDownload} className="mr-2" /> Export Flow
+        </button>
+
+        <button
+          onClick={handleRestoreFlow}
+          disabled={isRunning}
+          className={`
+      px-4 py-2 rounded-md font-semibold text-white
+      transition-colors duration-300 flex items-center
+      ${
+        isRunning
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
+      }
+    `}
+        >
+          <FontAwesomeIcon icon={faUpload} className="mr-2" /> Restore Flow
         </button>
       </div>
 
@@ -301,6 +488,7 @@ const Script = () =>
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onNodeContextMenu={onNodeContextMenu} // Thêm handler cho context menu
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           fitView
@@ -312,7 +500,23 @@ const Script = () =>
           <Controls />
         </ReactFlow>
       </div>
+
+
+
+      {/* Context Menu */}
+      {contextMenu.show && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onDelete={() => handleDeleteNode(contextMenu.nodeId)}
+          onClose={handleCloseContextMenu}
+        />
+      )}
+
     </div>
+
+
+
   );
 };
 

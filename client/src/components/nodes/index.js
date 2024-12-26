@@ -3,22 +3,46 @@ import OpenURLNode from './navigation/OpenURLNode';
 import RefreshPageNode from './navigation/RefreshPageNode';
 import StopNode from './other/StopNode';
 import VariablesNode from './other/VariablesNode';
+import ClickNode from './mouse/ClickNode';
+import TypeTextNode from './keyboard/TypeTextNode';
+import ElementExistsNode from './data/ElementExistsNode';
 
-import { faPlay, faStop, faGlobe, faRefresh, faCog } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faStop, faGlobe, faRefresh, faCog, faHandPointer, faKeyboard, faSearch } from "@fortawesome/free-solid-svg-icons";
 
 // Node definitions with categories
 export const nodeCategories = {
   Data: {
     label: "Data",
-    nodes: []
+    nodes: [
+      { 
+        type: "elementExists", 
+        label: "Element Exists", 
+        color: "blue",
+        icon: faSearch
+      }
+    ]
   },
   Keyboard: {
     label: "Keyboard",
-    nodes: []
+    nodes: [
+      { 
+        type: "typeText", 
+        label: "Type Text", 
+        color: "blue",
+        icon: faKeyboard
+      }
+    ]
   },
   Mouse: {
     label: "Mouse",
-    nodes: []
+    nodes: [
+      { 
+        type: "click", 
+        label: "Click", 
+        color: "blue",
+        icon: faHandPointer
+      }
+    ]
   },
   Navigation: {
     label: "Navigation",
@@ -70,6 +94,9 @@ export const nodeTypes = {
   refreshPage: RefreshPageNode,
   stop: StopNode,
   variables: VariablesNode,
+  click: ClickNode,
+  typeText: TypeTextNode,
+  elementExists: ElementExistsNode
 };
 
 // Flat node templates (if needed for compatibility)

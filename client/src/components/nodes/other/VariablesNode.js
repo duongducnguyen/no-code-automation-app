@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCog, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useVariables } from "../../../context/VariablesContext";
 
 const customModalStyles = {
   content: {
@@ -24,6 +25,7 @@ const customModalStyles = {
   const VariablesNode = ({ data, id }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [variables, setVariables] = useState(data.variables || []);
+  const { setGlobalVariables } = useVariables();
 
   const handleDoubleClick = () => {
     setModalIsOpen(true);
@@ -45,6 +47,7 @@ const customModalStyles = {
 
   const handleSave = () => {
     data.updateNodeData(id, { ...data, variables });
+    setGlobalVariables(variables); // Cập nhật global variables
     setModalIsOpen(false);
   };
 

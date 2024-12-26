@@ -1,5 +1,4 @@
-class Variables 
-{
+class Variables {
   constructor() {
     this.variables = new Map();
   }
@@ -21,6 +20,20 @@ class Variables
 
   getAll() {
     return Object.fromEntries(this.variables);
+  }
+
+  // Thêm phương thức kiểm tra biến tồn tại
+  hasVariable(name) {
+    return this.variables.has(name);
+  }
+
+  // Thêm phương thức cập nhật giá trị
+  updateValue(name, newValue) {
+    if (!this.hasVariable(name)) {
+      throw new Error(`Variable ${name} does not exist`);
+    }
+    this.variables.set(name, newValue);
+    return true;
   }
 }
 

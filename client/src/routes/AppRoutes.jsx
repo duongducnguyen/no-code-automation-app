@@ -6,10 +6,12 @@ import ProtectedRoute from "./ProtectedRoute";
 import UnauthorizedRoute from "./UnauthorizedRoute";
 import Dashboard from "../features/Dashboard";
 import { UserProvider } from "../context/UserContext";
+import { VariablesProvider } from "../context/VariablesContext";
 
 const AppRoutes = () => {
   return (
     <UserProvider>
+      <VariablesProvider>
       <Routes>
         <Route element={<UnauthorizedRoute />}>
           <Route path="/" element={<LoginPage />} />
@@ -20,6 +22,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
+      </VariablesProvider>
     </UserProvider>
   );
 };

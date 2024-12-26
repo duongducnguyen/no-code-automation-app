@@ -13,7 +13,8 @@ class FlowExecutor
     // Đọc variables từ node variables
     this.variables = new Variables();
     const variablesNode = flowData.nodes.find(node => node.type === 'variables');
-    if (variablesNode?.data?.variables) {
+    if (variablesNode?.data?.variables) 
+    {
       this.variables.setVariables(variablesNode.data.variables);
     }
     
