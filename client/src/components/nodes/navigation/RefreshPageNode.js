@@ -1,4 +1,3 @@
-// nodes/StopNode.jsx
 import React from 'react';
 import { Handle, Position } from 'reactflow';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

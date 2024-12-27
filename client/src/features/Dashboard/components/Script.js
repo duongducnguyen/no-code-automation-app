@@ -432,54 +432,60 @@ const Script = () => {
         </button>
       </div>
 
-      {/* Node Types Menu */}
-      <div className="node-types-menu overflow-y-auto">
-        <h3 className="font-semibold mb-3">NODES MENU</h3>
+{/* Node Types Menu */}
+<div className="node-types-menu">
+  {/* Header cố định */}
+  <div className="node-types-menu-header">
+    <h3 className="font-semibold">NODES MENU</h3>
+  </div>
+  
+  {/* Content có thể cuộn */}
+  <div className="node-types-menu-content">
+    {Object.entries(nodeCategories).map(([categoryKey, category]) => (
+      <div key={categoryKey} className="mb-4">
+        <h4 className="text-sm font-medium text-gray-600 mb-2 px-2">
+          {category.label}
+        </h4>
 
-        {Object.entries(nodeCategories).map(([categoryKey, category]) => (
-          <div key={categoryKey} className="mb-4">
-            <h4 className="text-sm font-medium text-gray-600 mb-2 px-2">
-              {category.label}
-            </h4>
-
-            {category.nodes.map((node, index) => (
-              <button
-                key={`${categoryKey}-${index}`}
-                onClick={() => addNewNode(node.type, node.label)}
-                disabled={
-                  (node.type === "start" && hasNodeType("start")) ||
-                  (node.type === "stop" && hasNodeType("stop")) ||
-                  (node.type === "variables" && hasNodeType("variables"))
-                }
-                className={`
-                  node-button bg-${node.color}-500 w-full text-left
-                  mb-2 p-2 rounded-md transition-colors
-                  hover:bg-gray-100 flex items-center
-                  ${
-                    (node.type === "start" && hasNodeType("start")) ||
-                    (node.type === "stop" && hasNodeType("stop")) ||
-                    (node.type === "variables" && hasNodeType("variables"))
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }
-                `}
-                title={node.description}
-              >
-                <span className="w-8">
-                  <FontAwesomeIcon icon={node.icon} />
-                </span>
-                <span className="flex-1">{node.label}</span>
-              </button>
-            ))}
-
-            {category.nodes.length === 0 && (
-              <p className="text-sm text-gray-400 italic px-2">
-                No nodes available
-              </p>
-            )}
-          </div>
+        {category.nodes.map((node, index) => (
+          <button
+            key={`${categoryKey}-${index}`}
+            onClick={() => addNewNode(node.type, node.label)}
+            disabled={
+              (node.type === "start" && hasNodeType("start")) ||
+              (node.type === "stop" && hasNodeType("stop")) ||
+              (node.type === "variables" && hasNodeType("variables"))
+            }
+            className={`
+              node-button bg-${node.color}-500 w-full text-left
+              mb-2 p-2 rounded-md transition-colors
+              hover:bg-gray-100 flex items-center
+              ${
+                (node.type === "start" && hasNodeType("start")) ||
+                (node.type === "stop" && hasNodeType("stop")) ||
+                (node.type === "variables" && hasNodeType("variables"))
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }
+            `}
+            title={node.description}
+          >
+            <span className="w-8">
+              <FontAwesomeIcon icon={node.icon} />
+            </span>
+            <span className="flex-1">{node.label}</span>
+          </button>
         ))}
+
+        {category.nodes.length === 0 && (
+          <p className="text-sm text-gray-400 italic px-2">
+            No nodes available
+          </p>
+        )}
       </div>
+    ))}
+  </div>
+</div>
 
       {/* Flow Container */}
       <div ref={reactFlowWrapper} className="w-full h-full">

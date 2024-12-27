@@ -6,8 +6,11 @@ import VariablesNode from './other/VariablesNode';
 import ClickNode from './mouse/ClickNode';
 import TypeTextNode from './keyboard/TypeTextNode';
 import ElementExistsNode from './data/ElementExistsNode';
+import GetTextNode from './data/GetTextNode';
+import NewTabNode from './navigation/NewTabNode';
+import ActivateTabNode from './navigation/ActivateTabNode';
 
-import { faPlay, faStop, faGlobe, faRefresh, faCog, faHandPointer, faKeyboard, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faStop, faGlobe, faRefresh, faCog, faHandPointer, faKeyboard, faSearch, faTimes, faSquarePlus, faArrowsLeftRight } from "@fortawesome/free-solid-svg-icons";
 
 // Node definitions with categories
 export const nodeCategories = {
@@ -19,6 +22,12 @@ export const nodeCategories = {
         label: "Element Exists", 
         color: "blue",
         icon: faSearch
+      },
+      { 
+        type: "getText", 
+        label: "Get Text", 
+        color: "blue",
+        icon: faTimes
       }
     ]
   },
@@ -58,6 +67,18 @@ export const nodeCategories = {
         label: "Refresh Page", 
         color: "blue",
         icon: faRefresh
+      },
+      { 
+        type: "newTab", 
+        label: "New Tab", 
+        color: "blue",
+        icon: faSquarePlus
+      },
+      { 
+        type: "activateTab", 
+        label: "Activate Tab", 
+        color: "blue",
+        icon: faArrowsLeftRight
       }
     ]
   },
@@ -82,7 +103,6 @@ export const nodeCategories = {
         color: "yellow",
         icon: faCog
       }
-
     ]
   }
 };
@@ -96,7 +116,11 @@ export const nodeTypes = {
   variables: VariablesNode,
   click: ClickNode,
   typeText: TypeTextNode,
-  elementExists: ElementExistsNode
+  elementExists: ElementExistsNode,
+  getText: GetTextNode,
+  newTab: NewTabNode,
+  activateTab: ActivateTabNode
+
 };
 
 // Flat node templates (if needed for compatibility)
