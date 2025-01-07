@@ -9,8 +9,10 @@ import ElementExistsNode from './data/ElementExistsNode';
 import GetTextNode from './data/GetTextNode';
 import NewTabNode from './navigation/NewTabNode';
 import ActivateTabNode from './navigation/ActivateTabNode';
+import CloseTabNode from './navigation/CloseTabNode';
+import GoBackNode from './navigation/GoBackNode';
 
-import { faPlay, faStop, faGlobe, faRefresh, faCog, faHandPointer, faKeyboard, faSearch, faTimes, faSquarePlus, faArrowsLeftRight } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faStop, faGlobe, faRefresh, faCog, faHandPointer, faKeyboard, faSearch, faTimes, faSquarePlus, faArrowsLeftRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 // Node definitions with categories
 export const nodeCategories = {
@@ -79,6 +81,18 @@ export const nodeCategories = {
         label: "Activate Tab", 
         color: "blue",
         icon: faArrowsLeftRight
+      },
+      { 
+        type: "closeTab", 
+        label: "Close Tab", 
+        color: "blue",
+        icon: faTimes
+      },
+      { 
+        type: "goBack", 
+        label: "Go Back", 
+        color: "blue",
+        icon: faArrowLeft
       }
     ]
   },
@@ -119,8 +133,9 @@ export const nodeTypes = {
   elementExists: ElementExistsNode,
   getText: GetTextNode,
   newTab: NewTabNode,
-  activateTab: ActivateTabNode
-
+  activateTab: ActivateTabNode,
+  closeTab: CloseTabNode,
+  goBack: GoBackNode
 };
 
 // Flat node templates (if needed for compatibility)

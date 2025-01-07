@@ -125,8 +125,13 @@ async function listAllTabs(driver) {
   }
 }
 
+
+module.exports = handleActivateTab;
+
+/*
 module.exports = {
   handleActivateTab,
   getCurrentTabInfo,
   listAllTabs
 };
+*/
